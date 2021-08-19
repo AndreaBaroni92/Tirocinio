@@ -1,0 +1,2 @@
+states=s0,s1,t0,t1,t2
+relation=s0,a,s1;s1,a,s1;t0,a,t0;t0,a,t1;t1,a,t1;t1,a,t2
