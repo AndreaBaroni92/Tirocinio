@@ -10,6 +10,9 @@ class Lts(val nodes: List[Node], val transRel: TransitionRelation) {
   // getLabel restituisce una lista di nodi destinazione che sono raggiungibili
   // a partire da un nodo sorgente (node) e da una label (label)
 
+  def InTransition(s:Node): List[(Node, Label, Node)] ={
+    transRel.rel.filter(x => x._3.name == s.name)
+  }
   def getLabel(node: Node, label: Label): List[Node] = {
 
     mapNode.get(node.name) match {
@@ -19,6 +22,10 @@ class Lts(val nodes: List[Node], val transRel: TransitionRelation) {
 
   }
 
+  def deadlockStates:List[Node] = {
+    val l1:List[Node] = transRel.rel.distinctBy(x => x._1.name).map(x => x._1)
+    nodes.filterNot(x => l1.exists(n => n.name == x.name))
+  }
 
   override def toString: String = s"Nodi:\n" +
     s"${nodes mkString ","} " +
