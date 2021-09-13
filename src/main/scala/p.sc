@@ -1,8 +1,4 @@
-val l = List(
+val l = List(1,2,3,4)
+val l2 = List(31,14,5,6,1)
 
-  List(List(1),List(2)),
-  List(List(3),List(4,5))
-
-)
-
-val risultato= l.flatten
+l.exists(el => l2.contains(el))
