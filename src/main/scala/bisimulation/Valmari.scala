@@ -19,7 +19,7 @@ class Valmari(val l: Lts) {
   val BlockRef = new Refinable(List(BlockBunch))
 
   // start splitter raggruppa le transizioni secondo le Label
-  val startSplitter = l
+  val startSplitter: List[List[Transition]] = l
     .transRel
     .rel
     .map(x => Transition(x))
