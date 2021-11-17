@@ -20,14 +20,22 @@ class Bisim(b: RefinableStructure,
     else
       blockRef.First(block2)
 
+   // println("Size s",blockRef.Size(blockRef.Set(s)) )
+    @tailrec
     def iter_s(s1: Int,
                touch_split: List[Int],
                touch_out: List[Int],
                split_Ref1: RefinableStructure,
-               outs_Ref1: RefinableStructure): (List[Int], List[Int], RefinableStructure, RefinableStructure) = {
+               outs_Ref1: RefinableStructure,
+               countAnd:Int): (List[Int], List[Int], RefinableStructure, RefinableStructure) = {
 
       if (s1 != 0) {
+        //println("s1, ",s1," c= ",countAnd)
 
+        /*
+        iter_t scandisce tutti gli elementi all'interno di in_trans
+         */
+        @tailrec
         def iter_t(in_trans: List[Int],
                    split_Ref2: RefinableStructure,
                    outs_Ref2: RefinableStructure,
@@ -36,6 +44,7 @@ class Bisim(b: RefinableStructure,
 
           in_trans match {
             case ::(head, next) => {
+              //println("head",head)
               val p = split_Ref2.Set(head)
               val o = outs_Ref2.Set(head)
               val touch_split3 = if (split_Ref2.No_marks(p)) p :: touch_split2 else touch_split2
@@ -53,7 +62,7 @@ class Bisim(b: RefinableStructure,
 
         val (split_Ref4, outs_Ref4, touch_splits3, touch_outs3) = iter_t(In_transitions(s1), split_Ref1, outs_Ref1, touch_split, touch_out)
 
-        iter_s(blockRef.Next(s1), touch_splits3, touch_outs3, split_Ref4, outs_Ref4)
+        iter_s(blockRef.Next(s1), touch_splits3, touch_outs3, split_Ref4, outs_Ref4,countAnd+1)
 
       }
       else {
@@ -62,13 +71,14 @@ class Bisim(b: RefinableStructure,
 
     }
 
-    iter_s(s, Nil, Nil, split_Ref0, outs_Ref0)
+    iter_s(s, Nil, Nil, split_Ref0, outs_Ref0,0)
 
   }
 
-  def updated2(touch_split5: List[Int],
-               unready_Bunches5: List[Int],
-               split_Ref5: RefinableStructure): (List[Int], RefinableStructure) = {
+  @tailrec
+  final def updated2(touch_split5: List[Int],
+                     unready_Bunches5: List[Int],
+                     split_Ref5: RefinableStructure): (List[Int], RefinableStructure) = {
     touch_split5 match {
       case ::(p, next) => {
         val u = if (split_Ref5.Has_many(split_Ref5.Bunch(p))) 0 else split_Ref5.Bunch(p)
@@ -85,8 +95,9 @@ class Bisim(b: RefinableStructure,
 
   }
 
-  def updated3(touch_outs5: List[Int],
-               outs_Ref5: RefinableStructure): RefinableStructure = {
+  @tailrec
+  final def updated3(touch_outs5: List[Int],
+                     outs_Ref5: RefinableStructure): RefinableStructure = {
 
     touch_outs5 match {
       case ::(o, next) => {
@@ -122,23 +133,27 @@ class Bisim(b: RefinableStructure,
   }
 
 
-  def iterSplitterBunches(start1: Int, //for u := 1 to Splitters.bunches do
-                          end1: Int,
-                          b1: RefinableStructure,
-                          s1: RefinableStructure,
-                          o1: RefinableStructure,
-                          unready_Bunch: List[Int]
+  @tailrec
+  final def iterSplitterBunches(start1: Int, //for u := 1 to Splitters.bunches do
+                                end1: Int,
+                                b1: RefinableStructure,
+                                s1: RefinableStructure,
+                                o1: RefinableStructure,
+                                unready_Bunch: List[Int]
                          ): (RefinableStructure, RefinableStructure, RefinableStructure, List[Int]) = {
 
     if (start1 <= end1) {
       val t = s1.Bunch_first(start1) //t := Splitters.Bunch_first(u)
 
+      //print("bunch splitter = ",t)
+      @tailrec
       def iterT(b2: RefinableStructure,
                 tb2: List[Int],
                 sp2: RefinableStructure,
                 i: Int): (RefinableStructure, List[Int]) = { //while t != 0 do
 
 
+       // println("i = ",i)
         if (i != 0) {
           val s = tail1(i) //s := tail[t];
           val b = b2.Set(s)
@@ -155,6 +170,7 @@ class Bisim(b: RefinableStructure,
 
       val (mark1Block, touchedBlocks) = iterT(b1, Nil, s1, t)
 
+      @tailrec
       def iterTouchedBlocks(block_ref7: RefinableStructure,
                             split_ref7: RefinableStructure,
                             outs_ref7: RefinableStructure,
@@ -162,7 +178,8 @@ class Bisim(b: RefinableStructure,
                             touchBlocks: List[Int]): (RefinableStructure, RefinableStructure, RefinableStructure, List[Int]) = {
         touchBlocks match {
           case ::(head, next) => { //head = b
-            val (nuovo, block_ref8) = block_ref7.Split1(head) //nuovo = b'
+            val (nuovo, block_ref8) = block_ref7.Split1(head) //nuovo =
+           // println("nuovo= ",nuovo)
             if (nuovo != 0) {
               val (unready_bunches8, split_ref8, outs_ref8) = updated(head, nuovo, block_ref8, split_ref7, outs_ref7, unready_bunches7)
 
@@ -190,15 +207,15 @@ class Bisim(b: RefinableStructure,
   }
 
 
-  val prova = iterSplitterBunches(1, s.bunches, b, s, o, Nil)
 
 
-  def iterUnreadyBunches(
-                          block_ref10: RefinableStructure,
-                          split_ref10: RefinableStructure,
-                          outs_ref10: RefinableStructure,
-                          unready_bunch10: List[Int]
-                        ): RefinableStructure = {
+  @tailrec
+  final def iterUnreadyBunches(
+                                block_ref10: RefinableStructure,
+                                split_ref10: RefinableStructure,
+                                outs_ref10: RefinableStructure,
+                                unready_bunch10: List[Int]
+                              ): RefinableStructure = {
 
     unready_bunch10 match {
       case ::(u, next) => {
@@ -206,6 +223,7 @@ class Bisim(b: RefinableStructure,
         val unready_bunch11 = if (split_ref11.Has_many(u)) unready_bunch10 else next
         val t = split_ref11.First(p)
 
+        @tailrec
         def iter_t(i: Int,
                    block_ref11: RefinableStructure,
                    touch_b11: List[Int],
@@ -219,10 +237,12 @@ class Bisim(b: RefinableStructure,
               val i2 = outs_ref10.Right_neighbour(i)
               if ((i1 > 0 && tail1(i1) == s && split_ref11.Bunch((split_ref11.Set(i1))) == u)
                 || (i2 > 0 && tail1(i2) == s && split_ref11.Bunch((split_ref11.Set(i2))) == u)) {
+               // println("Mark1s", s)
                 val block_ref12 = block_ref11.Mark1(s)
                 iter_t(split_ref11.Next(i), block_ref12, touch_b12)
               }
               else {
+                //println("Mark2", s)
                 val block_ref12 = block_ref11.Mark2(s)
                 iter_t(split_ref11.Next(i), block_ref12, touch_b12)
               }
@@ -300,14 +320,32 @@ class Bisim(b: RefinableStructure,
 
 
         val (block_ref18, split_ref18, outs_ref18, unready_bunch18) = iter_touched_blocks(block_ref13, split_ref11, outs_ref10, unready_bunch11, touch_b13)
-        iterUnreadyBunches(block_ref18,split_ref18,outs_ref18,unready_bunch18)
+        iterUnreadyBunches(block_ref18, split_ref18, outs_ref18, unready_bunch18)
       }
       case Nil => block_ref10
     }
 
   }
 
- val ris = iterUnreadyBunches(prova._1,prova._2,prova._3,prova._4)
 
+
+  def computeBisim(): RefinableStructure = {
+
+
+    val (block_ref,split_ref,outs_ref,unready_bunch): (RefinableStructure,
+      RefinableStructure,
+      RefinableStructure,
+      List[Int]) = iterSplitterBunches(1,
+      s.bunches,
+      b,
+      s,
+      o,
+      Nil)
+
+    //println("Prima Fase fatta")
+    val ris: RefinableStructure = iterUnreadyBunches(block_ref, split_ref, outs_ref, unready_bunch)
+    ris
+
+  }
 
 }

@@ -1,5 +1,7 @@
 package ValmVector
 
+import scala.annotation.tailrec
+
 class RefinableStructure(val elems: Vector[Int],
                          val loc: Vector[Int],
                          val first: Vector[Int],
@@ -22,7 +24,7 @@ class RefinableStructure(val elems: Vector[Int],
   def First(s: Int): Int = elems(first(s))
 
   def Next(e: Int): Int = {
-    if (loc(e) + 1 >= end(sidx(e)))
+    if ( loc(e) + 1 >= end(sidx(e)))
       0
     else
       elems(loc(e) + 1)
@@ -95,11 +97,12 @@ class RefinableStructure(val elems: Vector[Int],
   }
 
 
-  def iter(start: Int,
-           end: Int,
-           setsp: Int,
-           sidxp: Vector[Int],
-           elemsp: Vector[Int]): Vector[Int] = {
+  @tailrec
+  final def iter(start: Int,
+                 end: Int,
+                 setsp: Int,
+                 sidxp: Vector[Int],
+                 elemsp: Vector[Int]): Vector[Int] = {
 
     if (start > end) {
       sidxp

@@ -17,70 +17,61 @@ class Init(l: Lts) {
 
   val indexTrans: List[((Node, Label, Node), Int)] = l.transRel.rel.zipWithIndex.map(x => (x._1, x._2 + 1))
 
-  println(indexTrans)
+  //println(indexTrans)
   val mapIndexTrans: Map[Int, (Node, Label, Node)] = indexTrans.map(x => (x._2, x._1)).toMap
   val indexLabel: Map[String, Int] = l.listLab.zipWithIndex.map(x => (x._1, x._2 + 1)).toMap
 
   // tail[i] = t dove i = (t,l,h) e   1 =< i <= m dove m e' il numero massimo di transizioni
+
+
   val tail: Vector[Int] = -1 +: indexTrans.map(x => mapNodeSting getOrElse(x._1._1.name, -1)).toVector
+  /*
   val label: Vector[Int] = -1 +: indexTrans.map(x => indexLabel getOrElse(x._1._2.name, -1)).toVector
   val head: Vector[Int] = -1 +: indexTrans.map(x => mapNodeSting getOrElse(x._1._3.name, -1)).toVector
+  */
+
+  /*
+    val in_trans: Map[Int, List[Int]] = indexTrans.groupBy((x)=> x._1._3.name).toVector
+      .map((x )=> (mapNodeSting.getOrElse(x._1,-1),x._2.map(y => y._2))).toMap
+  */
+  val in_transition = indexTrans
+    .groupBy(x => x._1._3.name)
+    .toVector
+    .map(x => (mapNodeSting.getOrElse(x._1, 0), x._2))
+    .map(x => (x._1, x._2.map(y => y._2)))
+    .toMap
+    //initInTrans()
+
+
 
   def In_transitions(s: Int): List[Int] = {
-    indexTrans.filter(x => mapNodeSting.getOrElse(x._1._3.name, -1) == s).map(x => x._2)
+
+
+    //in_trans.getOrElse(s,Nil)
+    //indexTrans.filter(x => mapNodeSting.getOrElse(x._1._3.name, -1) == s).map(x => x._2)
+    in_transition.getOrElse(s,Nil)
   }
 
-  val elemOrderSplitter = indexTrans
-    .groupBy(x => x._1._2.name)
-    .toVector
-    .sortBy(x => x._1) //ordinati per label
-    .map(x => x._2.sortWith((t1, t2) => {
 
-      if (t1._1._1.name < t2._1._1.name)
-        true
-      else if (t1._1._1.name == t2._1._1.name && t1._1._2.name < t2._1._2.name)
-        true
-      else if (t1._1._1.name == t2._1._1.name && t1._1._2.name == t2._1._2.name && t1._1._3.name < t2._1._3.name)
-        true
-      else
-        false
-    }))
-    .map(x => x.map(y => y._2).toVector)
+  /*
+    val elemOrderSplitter = indexTrans
+      .groupBy(x => x._1._2.name)
+      .toVector
+      .sortBy(x => x._1) //ordinati per label
+      .map(x => x._2.sortWith((t1, t2) => {
 
-  val elemorderoutsets = indexTrans
-    .groupBy(x => x._1._2.name)
-    .toVector
-    .sortBy(x => x._1) //ordinati per label
-    .map(x => x._2.sortWith((t1, t2) => {
-      if (t1._1._1.name < t2._1._1.name)
-        true
-      else if (t1._1._1.name == t2._1._1.name && t1._1._2.name < t2._1._2.name)
-        true
-      else if (t1._1._1.name == t2._1._1.name && t1._1._2.name == t2._1._2.name && t1._1._3.name < t2._1._3.name)
-        true
-      else
-        false
-    }))
-    .map(x => x.groupBy(el => el._1._1.name).toVector)
-    .map(x => x.sortBy(ord => ord._1))
-    .flatMap(y => y.map(x => x._2.sortWith((t1, t2) => {
-      if (t1._1._1.name < t2._1._1.name)
-        true
-      else if (t1._1._1.name == t2._1._1.name && t1._1._2.name < t2._1._2.name)
-        true
-      else if (t1._1._1.name == t2._1._1.name && t1._1._2.name == t2._1._2.name && t1._1._3.name < t2._1._3.name)
-        true
-      else
-        false
-    }).toVector))
-    .map(x => x.map(y => y._2))
+        if (t1._1._1.name < t2._1._1.name)
+          true
+        else if (t1._1._1.name == t2._1._1.name && t1._1._2.name < t2._1._2.name)
+          true
+        else if (t1._1._1.name == t2._1._1.name && t1._1._2.name == t2._1._2.name && t1._1._3.name < t2._1._3.name)
+          true
+        else
+          false
+      }))
+      .map(x => x.map(y => y._2).toVector)
 
-
-
-  def initOutsets() = {
-
-
-    val sets1 =  indexTrans
+    val elemorderoutsets = indexTrans
       .groupBy(x => x._1._2.name)
       .toVector
       .sortBy(x => x._1) //ordinati per label
@@ -107,6 +98,110 @@ class Init(l: Lts) {
           false
       }).toVector))
       .map(x => x.map(y => y._2))
+  */
+
+  /*
+  La seguente funzione (initInTrans) serve
+  per inizializzare la struttura per In transitions
+  come definita dall'articolo di Valmari
+   */
+  def initInTrans() = {
+    val sets1 = indexTrans
+      .groupBy(x => x._1._3.name)
+      .toVector
+      .map(x => (mapNodeSting.getOrElse(x._1, 0), x._2))
+      .map(x => (x._1, x._2.map(y => y._2)))
+      .toMap
+      //.sortBy(x => x._1)
+
+/*
+    val numNodes = l.nodes.length
+
+    val ris = (0 to numNodes).toVector
+      .map(x => {
+        sets1.getOrElse(x, Nil)
+      })
+
+
+    ris
+    */
+    sets1
+
+  }
+
+
+  val raggruppaPerLabel: Vector[List[((Node, Label, Node), Int)]] = indexTrans
+    .groupBy(x => x._1._2.name)
+    .toVector
+    .map(x => x._2)//aggiunto 09 11
+    //.sortBy(x => x._1) //ordinati per label
+   /* .map(x => x._2.sortWith((t1, t2) => {
+      if (t1._1._1.name < t2._1._1.name)
+        true
+      else if (t1._1._1.name == t2._1._1.name && t1._1._2.name < t2._1._2.name)
+        true
+      else if (t1._1._1.name == t2._1._1.name && t1._1._2.name == t2._1._2.name && t1._1._3.name < t2._1._3.name)
+        true
+      else
+        false
+    }))*/
+
+  def initOutsets(): RefinableStructure = {
+
+/*
+    val sets1 = indexTrans
+      .groupBy(x => x._1._2.name)
+      .toVector
+      .sortBy(x => x._1) //ordinati per label
+      .map(x => x._2.sortWith((t1, t2) => {
+        if (t1._1._1.name < t2._1._1.name)
+          true
+        else if (t1._1._1.name == t2._1._1.name && t1._1._2.name < t2._1._2.name)
+          true
+        else if (t1._1._1.name == t2._1._1.name && t1._1._2.name == t2._1._2.name && t1._1._3.name < t2._1._3.name)
+          true
+        else
+          false
+      }))
+      .map(x => x.groupBy(el => el._1._1.name).toVector)
+      .map(x => x.sortBy(ord => ord._1))
+      .flatMap(y => y.map(x => x._2.sortWith((t1, t2) => {
+        if (t1._1._1.name < t2._1._1.name)
+          true
+        else if (t1._1._1.name == t2._1._1.name && t1._1._2.name < t2._1._2.name)
+          true
+        else if (t1._1._1.name == t2._1._1.name && t1._1._2.name == t2._1._2.name && t1._1._3.name < t2._1._3.name)
+          true
+        else
+          false
+      }).toVector))
+      .map(x => x.map(y => y._2))
+*/
+
+    /*
+    val sets1 = raggruppaPerLabel
+      .map(x => x.groupBy(el => el._1._1.name).toVector)
+      .map(x => x.sortBy(ord => ord._1))
+      .flatMap(y => y.map(x => x._2.sortWith((t1, t2) => {
+        if (t1._1._1.name < t2._1._1.name)
+          true
+        else if (t1._1._1.name == t2._1._1.name && t1._1._2.name < t2._1._2.name)
+          true
+        else if (t1._1._1.name == t2._1._1.name && t1._1._2.name == t2._1._2.name && t1._1._3.name < t2._1._3.name)
+          true
+        else
+          false
+      }).toVector))
+      .map(x => x.map(y => y._2))
+    */
+
+    // aggiornato il 9 11
+
+    val sets1 = raggruppaPerLabel
+      .map(x => x.groupBy(el => el._1._1.name).toVector)
+      //.map(x => x.sortBy(ord => ord._1))
+      .flatMap(y => y.map(x => x._2.toVector))
+      .map(x => x.map(y => y._2))
 
 
     val elems = 0 +: sets1.flatten
@@ -118,6 +213,7 @@ class Init(l: Lts) {
 
     val sets = sets1.length
 
+    @tailrec
     def computeFirst(v: Vector[Vector[Int]],
                      ris: Vector[Int],
                      index: Int,
@@ -221,21 +317,7 @@ class Init(l: Lts) {
   def initSplitter(): RefinableStructure = {
 
 
-    val sets1 = indexTrans
-      .groupBy(x => x._1._2.name)
-      .toVector
-      .sortBy(x => x._1) //ordinati per label
-      .map(x => x._2.sortWith((t1, t2) => {
-
-        if (t1._1._1.name < t2._1._1.name)
-          true
-        else if (t1._1._1.name == t2._1._1.name && t1._1._2.name < t2._1._2.name)
-          true
-        else if (t1._1._1.name == t2._1._1.name && t1._1._2.name == t2._1._2.name && t1._1._3.name < t2._1._3.name)
-          true
-        else
-          false
-      }))
+    val sets1 = raggruppaPerLabel
       .map(x => x.map(y => y._2).toVector)
 
 
@@ -248,6 +330,7 @@ class Init(l: Lts) {
 
     val sets = sets1.length
 
+    @tailrec
     def computeFirst(v: Vector[Vector[Int]],
                      ris: Vector[Int],
                      index: Int,

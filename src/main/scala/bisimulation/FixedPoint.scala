@@ -12,7 +12,8 @@ class FixedPoint(val l: Lts) {
     val start = l.nodes.flatMap(x => l.nodes.map(y => (x, y))) // prodotto cartesiano stati Q X Q
 
 
-    def check(p: Node, q: Node, rel: List[(Node, Node)]): Boolean = {
+    def check(p: Node, q: Node, rel: List[(Node, Node)])
+    : Boolean = {
 
       l.mapNode.get(p.name) match {
         case Some(value) => value.forall(x => {
