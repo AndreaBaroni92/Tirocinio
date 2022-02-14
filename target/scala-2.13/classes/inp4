@@ -1,3 +1,0 @@
-states=q1,q2,q3,q4,q5,q6,q7
-relation=q1,a,q2;q2,b,q1;q3,b,q1;q1,a,q3
-relation=q4,a,q5;q5,b,q4;q4,a,q6;q6,b,q4;q4,a,q7;q7,b,q4
