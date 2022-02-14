@@ -25,87 +25,24 @@ class Init(l: Lts) {
 
 
   val tail: Vector[Int] = -1 +: indexTrans.map(x => mapNodeSting getOrElse(x._1._1.name, -1)).toVector
-  /*
-  val label: Vector[Int] = -1 +: indexTrans.map(x => indexLabel getOrElse(x._1._2.name, -1)).toVector
-  val head: Vector[Int] = -1 +: indexTrans.map(x => mapNodeSting getOrElse(x._1._3.name, -1)).toVector
-  */
-
-  /*
-    val in_trans: Map[Int, List[Int]] = indexTrans.groupBy((x)=> x._1._3.name).toVector
-      .map((x )=> (mapNodeSting.getOrElse(x._1,-1),x._2.map(y => y._2))).toMap
-  */
-  val in_transition = indexTrans
-    .groupBy(x => x._1._3.name)
-    .toVector
-    .map(x => (mapNodeSting.getOrElse(x._1, 0), x._2))
-    .map(x => (x._1, x._2.map(y => y._2)))
-    .toMap
-    //initInTrans()
 
 
+  val newIn_tras: Vector[List[Int]] = initInTrans()
 
   def In_transitions(s: Int): List[Int] = {
 
-
-    //in_trans.getOrElse(s,Nil)
-    //indexTrans.filter(x => mapNodeSting.getOrElse(x._1._3.name, -1) == s).map(x => x._2)
-    in_transition.getOrElse(s,Nil)
+    newIn_tras(s)
   }
 
 
-  /*
-    val elemOrderSplitter = indexTrans
-      .groupBy(x => x._1._2.name)
-      .toVector
-      .sortBy(x => x._1) //ordinati per label
-      .map(x => x._2.sortWith((t1, t2) => {
 
-        if (t1._1._1.name < t2._1._1.name)
-          true
-        else if (t1._1._1.name == t2._1._1.name && t1._1._2.name < t2._1._2.name)
-          true
-        else if (t1._1._1.name == t2._1._1.name && t1._1._2.name == t2._1._2.name && t1._1._3.name < t2._1._3.name)
-          true
-        else
-          false
-      }))
-      .map(x => x.map(y => y._2).toVector)
-
-    val elemorderoutsets = indexTrans
-      .groupBy(x => x._1._2.name)
-      .toVector
-      .sortBy(x => x._1) //ordinati per label
-      .map(x => x._2.sortWith((t1, t2) => {
-        if (t1._1._1.name < t2._1._1.name)
-          true
-        else if (t1._1._1.name == t2._1._1.name && t1._1._2.name < t2._1._2.name)
-          true
-        else if (t1._1._1.name == t2._1._1.name && t1._1._2.name == t2._1._2.name && t1._1._3.name < t2._1._3.name)
-          true
-        else
-          false
-      }))
-      .map(x => x.groupBy(el => el._1._1.name).toVector)
-      .map(x => x.sortBy(ord => ord._1))
-      .flatMap(y => y.map(x => x._2.sortWith((t1, t2) => {
-        if (t1._1._1.name < t2._1._1.name)
-          true
-        else if (t1._1._1.name == t2._1._1.name && t1._1._2.name < t2._1._2.name)
-          true
-        else if (t1._1._1.name == t2._1._1.name && t1._1._2.name == t2._1._2.name && t1._1._3.name < t2._1._3.name)
-          true
-        else
-          false
-      }).toVector))
-      .map(x => x.map(y => y._2))
-  */
 
   /*
   La seguente funzione (initInTrans) serve
   per inizializzare la struttura per In transitions
   come definita dall'articolo di Valmari
    */
-  def initInTrans() = {
+  def initInTrans(): Vector[List[Int]] = {
     val sets1 = indexTrans
       .groupBy(x => x._1._3.name)
       .toVector
@@ -114,7 +51,7 @@ class Init(l: Lts) {
       .toMap
       //.sortBy(x => x._1)
 
-/*
+
     val numNodes = l.nodes.length
 
     val ris = (0 to numNodes).toVector
@@ -124,8 +61,8 @@ class Init(l: Lts) {
 
 
     ris
-    */
-    sets1
+
+    //sets1
 
   }
 
@@ -134,66 +71,14 @@ class Init(l: Lts) {
     .groupBy(x => x._1._2.name)
     .toVector
     .map(x => x._2)//aggiunto 09 11
-    //.sortBy(x => x._1) //ordinati per label
-   /* .map(x => x._2.sortWith((t1, t2) => {
-      if (t1._1._1.name < t2._1._1.name)
-        true
-      else if (t1._1._1.name == t2._1._1.name && t1._1._2.name < t2._1._2.name)
-        true
-      else if (t1._1._1.name == t2._1._1.name && t1._1._2.name == t2._1._2.name && t1._1._3.name < t2._1._3.name)
-        true
-      else
-        false
-    }))*/
+
+
 
   def initOutsets(): RefinableStructure = {
 
-/*
-    val sets1 = indexTrans
-      .groupBy(x => x._1._2.name)
-      .toVector
-      .sortBy(x => x._1) //ordinati per label
-      .map(x => x._2.sortWith((t1, t2) => {
-        if (t1._1._1.name < t2._1._1.name)
-          true
-        else if (t1._1._1.name == t2._1._1.name && t1._1._2.name < t2._1._2.name)
-          true
-        else if (t1._1._1.name == t2._1._1.name && t1._1._2.name == t2._1._2.name && t1._1._3.name < t2._1._3.name)
-          true
-        else
-          false
-      }))
-      .map(x => x.groupBy(el => el._1._1.name).toVector)
-      .map(x => x.sortBy(ord => ord._1))
-      .flatMap(y => y.map(x => x._2.sortWith((t1, t2) => {
-        if (t1._1._1.name < t2._1._1.name)
-          true
-        else if (t1._1._1.name == t2._1._1.name && t1._1._2.name < t2._1._2.name)
-          true
-        else if (t1._1._1.name == t2._1._1.name && t1._1._2.name == t2._1._2.name && t1._1._3.name < t2._1._3.name)
-          true
-        else
-          false
-      }).toVector))
-      .map(x => x.map(y => y._2))
-*/
 
-    /*
-    val sets1 = raggruppaPerLabel
-      .map(x => x.groupBy(el => el._1._1.name).toVector)
-      .map(x => x.sortBy(ord => ord._1))
-      .flatMap(y => y.map(x => x._2.sortWith((t1, t2) => {
-        if (t1._1._1.name < t2._1._1.name)
-          true
-        else if (t1._1._1.name == t2._1._1.name && t1._1._2.name < t2._1._2.name)
-          true
-        else if (t1._1._1.name == t2._1._1.name && t1._1._2.name == t2._1._2.name && t1._1._3.name < t2._1._3.name)
-          true
-        else
-          false
-      }).toVector))
-      .map(x => x.map(y => y._2))
-    */
+
+
 
     // aggiornato il 9 11
 
@@ -278,23 +163,6 @@ class Init(l: Lts) {
 
 
 
-
-
-
-
-
-    /*
-        val provaStampa = sets1.flatten.map(x => mapIndexTrans.getOrElse(x,
-          (new Node("Err"),
-          new Label("Err"),
-        new Node("Errore")
-          )
-        )
-        )
-        provaStampa.map(x => x.toString()).mkString(",")
-        */
-
-
     new RefinableStructure(
       elems,
       loc,
@@ -307,7 +175,8 @@ class Init(l: Lts) {
       sidx,
       uidx,
       sets,
-      bunches = 1
+      bunches = 1,
+      elems.length - 1
     )
 
 
@@ -394,23 +263,6 @@ class Init(l: Lts) {
 
 
 
-
-
-
-
-
-    /*
-        val provaStampa = sets1.flatten.map(x => mapIndexTrans.getOrElse(x,
-          (new Node("Err"),
-          new Label("Err"),
-        new Node("Errore")
-          )
-        )
-        )
-        provaStampa.map(x => x.toString()).mkString(",")
-        */
-
-
     new RefinableStructure(
       elems,
       loc,
@@ -423,11 +275,22 @@ class Init(l: Lts) {
       sidx,
       uidx,
       sets,
-      bunches = sets
+      bunches = sets,
+      elems.length -1
     )
 
   }
 
+
+  def printBisimEquivalence(r:RefinableStructure) = {
+    val toPrint = r.elems.drop(1).map(x => (x,r.Set(x)))
+
+    val auxList = toPrint.groupBy(elm => elm._2).values.toList
+
+    auxList.map(e => e.map(tup => mapNodeInt.getOrElse(tup._1,"Errore")))
+
+
+  }
 
   def printSet(r: RefinableStructure): String = {
 
@@ -452,9 +315,11 @@ class Init(l: Lts) {
           .concat(x._1.toString)
           .concat(" = { ")
         val listIter = x._2
-        val listUnmarked = listIter.filter(x => x._4 == 3).map(x => mapNodeInt getOrElse(x._1, "Errore"))
-        val listmark1 = listIter.filter(x => x._4 == 1).map(x => mapNodeInt getOrElse(x._1, "Errore"))
-        val listmark2 = listIter.filter(x => x._4 == 2).map(x => mapNodeInt getOrElse(x._1, "Errore"))
+        val nuovaList = listIter.groupBy(key => key._4)
+        val listUnmarked=nuovaList.getOrElse(3,Nil).map(x => mapNodeInt getOrElse(x._1, "Errore"))
+        //val listUnmarked = listIter.filter(x => x._4 == 3).map(x => mapNodeInt getOrElse(x._1, "Errore"))
+        val listmark1 = nuovaList.getOrElse(1,Nil).map(x => mapNodeInt getOrElse(x._1, "Errore"))
+        val listmark2 = nuovaList.getOrElse(2,Nil).map(x => mapNodeInt getOrElse(x._1, "Errore"))
         val str2 = "Unmarked = { " ++
           listUnmarked.mkString(",") ++ " } ; " ++
           " Mark 1 = { " ++ listmark1.mkString(",") ++ "} ; " ++
@@ -471,7 +336,7 @@ class Init(l: Lts) {
 
     val states = listBunches
       .toList
-      .sortBy(x => x._1)
+      //.sortBy(x => x._1)
       .map(x => {
         val str1 = "Bunches "
           .concat(x._1.toString)
@@ -586,7 +451,8 @@ class Init(l: Lts) {
       sidx,
       uidx,
       sets,
-      bunches)
+      bunches,
+      elems.length - 1)
 
   }
 

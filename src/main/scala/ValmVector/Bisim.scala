@@ -15,12 +15,15 @@ class Bisim(b: RefinableStructure,
               split_Ref0: RefinableStructure,
               outs_Ref0: RefinableStructure): (List[Int], List[Int], RefinableStructure, RefinableStructure) = {
 
-    val s = if (blockRef.Size(block1) <= blockRef.Size(block2))
-      blockRef.First(block1)
-    else
-      blockRef.First(block2)
+    val s = if (blockRef.Size(block1) <= blockRef.Size(block2)) {
 
-   // println("Size s",blockRef.Size(blockRef.Set(s)) )
+      blockRef.First(block1)
+    } else {
+
+      blockRef.First(block2)
+    }
+
+    // println("Size s",blockRef.Size(blockRef.Set(s)) )
     @tailrec
     def iter_s(s1: Int,
                touch_split: List[Int],
@@ -237,12 +240,12 @@ class Bisim(b: RefinableStructure,
               val i2 = outs_ref10.Right_neighbour(i)
               if ((i1 > 0 && tail1(i1) == s && split_ref11.Bunch((split_ref11.Set(i1))) == u)
                 || (i2 > 0 && tail1(i2) == s && split_ref11.Bunch((split_ref11.Set(i2))) == u)) {
-               // println("Mark1s", s)
+
                 val block_ref12 = block_ref11.Mark1(s)
                 iter_t(split_ref11.Next(i), block_ref12, touch_b12)
               }
               else {
-                //println("Mark2", s)
+
                 val block_ref12 = block_ref11.Mark2(s)
                 iter_t(split_ref11.Next(i), block_ref12, touch_b12)
               }
@@ -342,8 +345,9 @@ class Bisim(b: RefinableStructure,
       o,
       Nil)
 
-    //println("Prima Fase fatta")
+    println("Prima Fase fatta")
     val ris: RefinableStructure = iterUnreadyBunches(block_ref, split_ref, outs_ref, unready_bunch)
+    println("seconda Fase fatta")
     ris
 
   }

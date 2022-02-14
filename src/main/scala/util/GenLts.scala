@@ -31,7 +31,9 @@ object GenLts {
     //println(f.getParentFile().mkdirs())
     //println(f.getParent())
 
-    createBench(10000, 5,10000, 10)
+   // (1 to 20).foreach(i =>createBench(i * 1000, 10,20000, 10))
+
+    createBench(10000, 10,500000, 1)
     //val x = new File("C:\\Users\\utente\\Desktop\\160711\\src\\main\\scala\\lts20_2_10")
     //println(x.listFiles().mkString(","))
 

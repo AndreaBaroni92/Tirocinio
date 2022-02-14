@@ -13,9 +13,15 @@ class RefinableStructure(val elems: Vector[Int],
                          val sidx: Vector[Int],
                          val uidx: Vector[Int],
                          val sets: Int,
-                         val bunches: Int) {
+                         val bunches: Int,
+                         val sizeElems:Int) {
 
-  val items = elems.max
+  //val items = elems.max
+
+  //modifica 20 11
+  //val items = elems.length - 1
+
+  val items = sizeElems
 
   def Size(s: Int): Int = end(s) - first(s)
 
@@ -54,7 +60,8 @@ class RefinableStructure(val elems: Vector[Int],
         sidx,
         uidx,
         sets,
-        bunches)
+        bunches,
+        items)
     }
 
     else {
@@ -88,7 +95,8 @@ class RefinableStructure(val elems: Vector[Int],
         sidx,
         uidx,
         sets,
-        bunches)
+        bunches,
+        items)
     }
     else {
       this
@@ -133,7 +141,8 @@ class RefinableStructure(val elems: Vector[Int],
         sidx,
         uidx,
         sets,
-        bunches)
+        bunches,
+        items)
       (0, nuovaRef)
     }
     else if (mid1(s) == first(s)) {
@@ -167,7 +176,8 @@ class RefinableStructure(val elems: Vector[Int],
         sidxup1,
         uidxup1,
         setsup1,
-        bunches))
+        bunches,
+        items))
 
     }
 
@@ -187,7 +197,8 @@ class RefinableStructure(val elems: Vector[Int],
         sidx,
         uidx,
         sets,
-        bunches)
+        bunches,
+        items)
       (0, nuovaRef)
     }
     else if (mid2(s) == end(s)) {
@@ -216,7 +227,9 @@ class RefinableStructure(val elems: Vector[Int],
         uend,
         sidxup1,
         uidxup1,
-        setsup1, bunches
+        setsup1,
+        bunches,
+        items
       ))
 
     }
@@ -278,9 +291,11 @@ class RefinableStructure(val elems: Vector[Int],
             sidx,
             uidxup1,
             sets,
-            bunchesup1))
+            bunchesup1,
+            items))
       }
       else {
+
         val uendup1 = uend.updated(u, first(s2))
         val ufirstup1 = ufirst :+ first(s2)
         val uendup2 = uendup1 :+ end(s2)
@@ -296,7 +311,8 @@ class RefinableStructure(val elems: Vector[Int],
           sidx,
           uidxup1,
           sets,
-          bunchesup1))
+          bunchesup1,
+          items))
 
 
       }
